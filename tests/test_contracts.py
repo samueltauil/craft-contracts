@@ -8,6 +8,7 @@ from craft_contracts.graph import GraphRecord, GraphStore
 from craft_contracts.models import DemoManifest
 from craft_contracts.models import OperationRequest
 from craft_contracts.runner import InMemoryRunner
+from craft_contracts.service import CraftService
 
 
 def load_example() -> DemoManifest:
@@ -87,3 +88,25 @@ def test_runner_rejects_undeclared_operation():
     runner = InMemoryRunner(load_example(), {})
     result = runner.execute(OperationRequest("pause", "instance-1", "se@example.invalid"))
     assert result.status == "rejected"
+
+
+def test_service_catalog_and_instance_lifecycle():
+    service = CraftService()
+    manifest = load_example()
+    service.register(
+        manifest,
+        InMemoryRunner(
+            manifest,
+            {
+                "provision": lambda _request: {"endpoint": "https://example.invalid"},
+                "configure": lambda _request: {"fixtures": 1},
+                "validate": lambda _request: {"checks": ["primary_path"]},
+                "destroy": lambda _request: {"deleted_resources": 1},
+            },
+        ),
+    )
+    assert service.catalog()[0]["id"] == manifest.id
+    instance = service.request_instance(manifest.id, "se@example.invalid", {})
+    assert instance.status == "provisioned"
+    service.execute(instance.id, "configure", {})
+    assert service.instances[instance.id].status == "configured"
