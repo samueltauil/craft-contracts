@@ -1,0 +1,60 @@
+{
+  "id": "ambient-ai-clinical-documentation",
+  "version": "0.1.0",
+  "name": "Ambient AI clinical documentation",
+  "problem": "Reduce manual effort in drafting synthetic clinical notes.",
+  "audience": ["providers", "solution engineers"],
+  "solution_boundaries": ["synthetic encounters only", "drafts require human review"],
+  "products": ["speech", "grounded generation", "web application"],
+  "owner": "craft-demo-team",
+  "maturity": "automated",
+  "catalog_only": false,
+  "lifecycle_profile": "EPHEMERAL",
+  "operations": [
+    {
+      "name": "provision",
+      "supported": true,
+      "expected_duration_seconds": 900,
+      "idempotent": true,
+      "inputs": ["region", "instance_id"],
+      "outputs": ["endpoint"],
+      "failure_behavior": "preserve infrastructure and return a retryable failure"
+    },
+    {
+      "name": "configure",
+      "supported": true,
+      "expected_duration_seconds": 300,
+      "idempotent": true,
+      "inputs": ["fixture_reference"],
+      "outputs": ["fixture_count"]
+    },
+    {
+      "name": "validate",
+      "supported": true,
+      "expected_duration_seconds": 180,
+      "idempotent": true,
+      "inputs": [],
+      "outputs": ["checks"]
+    },
+    {
+      "name": "destroy",
+      "supported": true,
+      "expected_duration_seconds": 600,
+      "idempotent": true,
+      "inputs": [],
+      "outputs": ["deleted_resources"]
+    }
+  ],
+  "estimated_monthly_cost": 120.0,
+  "maximum_lifetime_days": 3,
+  "supported_regions": ["swedencentral"],
+  "data_classification": "synthetic",
+  "identity_approach": "managed_identity",
+  "private_networking": true,
+  "source_revision": "example-0.1.0",
+  "configure_retry_budget": 3,
+  "tags": {
+    "data": "synthetic",
+    "maturity": "automated"
+  }
+}
